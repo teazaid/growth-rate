@@ -2,7 +2,7 @@ package com.quest.assignment
 
 import java.io.{BufferedWriter, FileWriter}
 
-import com.quest.assignment.io.{CSVWriter, FileGrowthRateSerializer, FileReader}
+import com.quest.assignment.io.{CSVWriter, FileGrowthRateCSVSerializer, FileReader}
 import com.quest.assignment.models.{FileGrowthRate, FileId}
 import com.quest.assignment.parser._
 import com.quest.assignment.service.{FileGrowthRateService, GrowthRateCalculator}
@@ -22,14 +22,14 @@ object Runner {
     val fileStatsParser = new FileStatsParser(fileIdParser, timestampParser, fileSizeParser)
     val growthRateInBytesPerHour = new GrowthRateCalculator()
 
-    val csvWriter = new CSVWriter(new FileGrowthRateSerializer())
+    val csvWriter = new CSVWriter(new FileGrowthRateCSVSerializer())
 
-    val service = new FileGrowthRateService(fileReader,
+    val fileGrowthRateService = new FileGrowthRateService(fileReader,
       fileMappingsParser,
       fileStatsParser,
       growthRateInBytesPerHour)
 
-    val fileGrowthRatesByFileId = service.calculateFileGrowsRates(fileMappingsDataSetPath, fileStatsDataSetPath)
+    val fileGrowthRatesByFileId = fileGrowthRateService.calculateFileGrowsRates(fileMappingsDataSetPath, fileStatsDataSetPath)
     writeFileGrowthRatesByFileId(csvWriter, fileGrowthRatesByFileId)
 
     println("Done")
@@ -41,16 +41,9 @@ object Runner {
     fileGrowthRatesByFileId.foreach { case (fileId, fileGrowthRates) =>
       val bufferedWriter = new BufferedWriter(new FileWriter(s"${ fileId.value }.csv"))
 
-      csvWriter.writeToCsv(getHeader(), fileGrowthRates)(bufferedWriter)
+      csvWriter.writeToCsv(fileGrowthRates)(bufferedWriter)
 
       bufferedWriter.close()
     }
 
-  private def getHeader(): List[String] = List(
-    "\"FileID\"",
-    "\"Name\"",
-    "\"Timestamp\"",
-    "\"SizeInBytes\"",
-    "\"GrowthRateInBytesPerHour\""
-  )
 }

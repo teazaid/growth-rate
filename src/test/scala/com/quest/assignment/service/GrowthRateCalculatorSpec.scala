@@ -55,6 +55,10 @@ class GrowthRateCalculatorSpec extends WordSpec with Matchers {
         fileStatsMultiFieldParser.parse("1,\"2015-03-26 01:10:49.909\",4308267").get
       ) shouldEqual GrowthRate(0.0)
 
+      calc.ratePerHour(
+        fileStatsMultiFieldParser.parse("1,\"2015-03-25 10:00:16.902\",1000000").get,
+        fileStatsMultiFieldParser.parse("1,\"2015-03-25 12:00:16.902\",2000000").get
+      ) shouldEqual GrowthRate(500000.0)
     }
   }
 }

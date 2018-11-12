@@ -4,10 +4,10 @@ import com.quest.assignment.models._
 import com.quest.assignment.parser.TimestampParser
 import org.scalatest.{Matchers, WordSpec}
 
-class FileGrowthRateSerializerSpec extends WordSpec with Matchers {
-  "FileGrowthRateSerializer" should {
+class FileGrowthRateCSVSerializerSpec extends WordSpec with Matchers {
+  "FileGrowthRateCSVSerializer" should {
     "serialize FileGrowth to String" in {
-      val fileGrowthRateSerializer = new FileGrowthRateSerializer()
+      val fileGrowthRateSerializer = new FileGrowthRateCSVSerializer()
 
       fileGrowthRateSerializer.serialize(
         FileGrowthRate(

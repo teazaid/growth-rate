@@ -1,4 +1,4 @@
-name := "rate-per-hour-calculater"
+name := "growth-rate"
 
 version := "0.1"
 

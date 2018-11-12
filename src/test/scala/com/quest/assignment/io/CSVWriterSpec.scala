@@ -5,9 +5,10 @@ import java.io.{BufferedWriter, CharArrayWriter}
 import com.quest.assignment.models._
 import com.quest.assignment.parser.TimestampParser
 import org.scalatest.{Matchers, WordSpec}
+import sun.security.action.GetPropertyAction
 
 class CSVWriterSpec extends WordSpec with Matchers {
-  private val serializer = new FileGrowthRateSerializer()
+  private val serializer = new FileGrowthRateCSVSerializer()
   private val csvWriter = new CSVWriter(serializer)
 
   private val fileGrowthRate = FileGrowthRate(
@@ -17,23 +18,19 @@ class CSVWriterSpec extends WordSpec with Matchers {
     FileSize(4276852),
     GrowthRate(34291.5))
 
-  private val headerColumns = List(
-    "\"FileID\"",
-    "\"Name\"",
-    "\"Timestamp\"",
-    "\"SizeInBytes\"",
-    "\"GrowthRateInBytesPerHour\""
-  )
+  // line separator is OS specific
+  private val lineSeparator = java.security.AccessController.doPrivileged(
+    new GetPropertyAction("line.separator"))
 
   "CSVWriter" should {
     "write header" in {
       val charArrayWriter = new CharArrayWriter
       val bufferedWriter = new BufferedWriter(charArrayWriter)
 
-      csvWriter.writeHeader(headerColumns)(bufferedWriter)
+      csvWriter.writeHeader()(bufferedWriter)
       charArrayWriter.close()
       bufferedWriter.close()
-      charArrayWriter.toString shouldEqual "\"FileID\",\"Name\",\"Timestamp\",\"SizeInBytes\",\"GrowthRateInBytesPerHour\"\n"
+      charArrayWriter.toString shouldEqual s""""FileID","Name","Timestamp","SizeInBytes","GrowthRateInBytesPerHour"${lineSeparator}"""
     }
 
     "write csv content" in {
@@ -44,21 +41,20 @@ class CSVWriterSpec extends WordSpec with Matchers {
       charArrayWriter.close()
       bufferedWriter.close()
 
-      charArrayWriter.toString shouldEqual "1,c:\\program files\\sql server\\master.mdf,\"2015-03-25 23:55:45.787\",4276852,34291.5\n"
+      charArrayWriter.toString shouldEqual s"""1,c:\\program files\\sql server\\master.mdf,"2015-03-25 23:55:45.787",4276852,34291.5${lineSeparator}"""
     }
 
     "write header and content to csv" in {
       val charArrayWriter = new CharArrayWriter
       val bufferedWriter = new BufferedWriter(charArrayWriter)
 
-      csvWriter.writeToCsv(headerColumns, List(fileGrowthRate))(bufferedWriter)
+      csvWriter.writeToCsv(List(fileGrowthRate))(bufferedWriter)
 
       charArrayWriter.close()
       bufferedWriter.close()
 
       charArrayWriter.toString shouldEqual
-        "\"FileID\",\"Name\",\"Timestamp\",\"SizeInBytes\",\"GrowthRateInBytesPerHour\"\n" +
-        "1,c:\\program files\\sql server\\master.mdf,\"2015-03-25 23:55:45.787\",4276852,34291.5\n"
+        s""""FileID","Name","Timestamp","SizeInBytes","GrowthRateInBytesPerHour"${lineSeparator}1,c:\\program files\\sql server\\master.mdf,"2015-03-25 23:55:45.787",4276852,34291.5${lineSeparator}"""
     }
   }
 }
