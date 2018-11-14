@@ -1,6 +1,6 @@
 [![Coverage Status](https://coveralls.io/repos/github/teazaid/growth-rate/badge.svg?branch=master)](https://coveralls.io/github/teazaid/growth-rate?branch=master)
 
-Solution is written is scala thus scala specific features and FP principles are used: 
+Solution is written in scala, thus scala specific features and FP principles are used: 
  - value classes (https://docs.scala-lang.org/overviews/core/value-classes.html)
  These are provide compile time safety and no runtime overhead.
  - all services are stateless
